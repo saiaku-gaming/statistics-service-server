@@ -1,0 +1,47 @@
+package com.valhallagame.wardrobeserviceserver.controller;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.valhallagame.common.JS;
+import com.valhallagame.common.rabbitmq.NotificationMessage;
+import com.valhallagame.common.rabbitmq.RabbitMQRouting;
+import com.valhallagame.wardrobeserviceserver.message.AddWardrobeItemParameter;
+import com.valhallagame.wardrobeserviceserver.message.GetWardrobeItemsParameter;
+import com.valhallagame.wardrobeserviceserver.model.WardrobeItem;
+import com.valhallagame.wardrobeserviceserver.service.WardrobeItemService;
+
+@Controller
+@RequestMapping(path = "/v1/wardrobe")
+public class WardrobeController {
+
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
+
+	@Autowired
+	private WardrobeItemService wardrobeItemService;
+
+	@RequestMapping(path = "/get-wardrobe-items", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<?> getWardrobeItems(@RequestBody GetWardrobeItemsParameter input) {
+		return JS.message(HttpStatus.OK, wardrobeItemService.getWardrobeItems(input.getCharacterName()));
+	}
+
+	@RequestMapping(path = "/add-wardrobe-item", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<?> addWardrobeItem(@RequestBody AddWardrobeItemParameter input) {
+		wardrobeItemService.saveWardrobeItem(new WardrobeItem(input.getItemName(), input.getCharacterName()));
+		rabbitTemplate.convertAndSend(RabbitMQRouting.Exchange.WARDROBE.name(),
+				RabbitMQRouting.Wardrobe.ADD_WARDROBE_ITEM.name(),
+				new NotificationMessage(input.getCharacterName(), "wardrobe item added"));
+
+		return JS.message(HttpStatus.OK, "Wardrobe item added");
+	}
+}

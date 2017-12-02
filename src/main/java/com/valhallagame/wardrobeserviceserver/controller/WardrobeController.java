@@ -1,5 +1,10 @@
 package com.valhallagame.wardrobeserviceserver.controller;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,13 +35,15 @@ public class WardrobeController {
 
 	@RequestMapping(path = "/get-wardrobe-items", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<?> getWardrobeItems(@RequestBody GetWardrobeItemsParameter input) {
-		return JS.message(HttpStatus.OK, wardrobeItemService.getWardrobeItems(input.getCharacterName()));
+	public ResponseEntity<?> getWardrobeItems(@Valid @RequestBody GetWardrobeItemsParameter input) {
+		List<WardrobeItem> wardrobeItems = wardrobeItemService.getWardrobeItems(input.getCharacterName());
+		List<String> items = wardrobeItems.stream().map(item -> item.getName()).collect(Collectors.toList());
+		return JS.message(HttpStatus.OK, items);
 	}
 
 	@RequestMapping(path = "/add-wardrobe-item", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<?> addWardrobeItem(@RequestBody AddWardrobeItemParameter input) {
+	public ResponseEntity<?> addWardrobeItem(@Valid @RequestBody AddWardrobeItemParameter input) {
 		wardrobeItemService.saveWardrobeItem(new WardrobeItem(input.getItemName(), input.getCharacterName()));
 		rabbitTemplate.convertAndSend(RabbitMQRouting.Exchange.WARDROBE.name(),
 				RabbitMQRouting.Wardrobe.ADD_WARDROBE_ITEM.name(),

@@ -44,6 +44,14 @@ public class WardrobeController {
 	@RequestMapping(path = "/add-wardrobe-item", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<?> addWardrobeItem(@Valid @RequestBody AddWardrobeItemParameter input) {
+		
+		//Duplicate protection
+		List<WardrobeItem> wardrobeItems = wardrobeItemService.getWardrobeItems(input.getCharacterName());
+		List<String> items = wardrobeItems.stream().map(item -> item.getName()).collect(Collectors.toList());
+		if(items.contains(input.getItemName())) {
+			return JS.message(HttpStatus.ALREADY_REPORTED, "Already in store");
+		}
+		
 		wardrobeItemService.saveWardrobeItem(new WardrobeItem(input.getItemName(), input.getCharacterName()));
 		rabbitTemplate.convertAndSend(RabbitMQRouting.Exchange.WARDROBE.name(),
 				RabbitMQRouting.Wardrobe.ADD_WARDROBE_ITEM.name(),

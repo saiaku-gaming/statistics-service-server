@@ -19,8 +19,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.valhallagame.common.JS;
 import com.valhallagame.common.rabbitmq.NotificationMessage;
 import com.valhallagame.common.rabbitmq.RabbitMQRouting;
-import com.valhallagame.wardrobeserviceserver.message.AddWardrobeItemParameter;
-import com.valhallagame.wardrobeserviceserver.message.GetWardrobeItemsParameter;
+import com.valhallagame.wardrobeserviceclient.model.AddWardrobeItemParameter;
+import com.valhallagame.wardrobeserviceclient.model.GetWardrobeItemsParameter;
 import com.valhallagame.wardrobeserviceserver.model.WardrobeItem;
 import com.valhallagame.wardrobeserviceserver.service.WardrobeItemService;
 

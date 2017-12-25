@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.valhallagame.common.JS;
 import com.valhallagame.common.rabbitmq.NotificationMessage;
 import com.valhallagame.common.rabbitmq.RabbitMQRouting;
@@ -35,19 +36,19 @@ public class WardrobeController {
 
 	@RequestMapping(path = "/get-wardrobe-items", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<?> getWardrobeItems(@Valid @RequestBody GetWardrobeItemsParameter input) {
+	public ResponseEntity<JsonNode> getWardrobeItems(@Valid @RequestBody GetWardrobeItemsParameter input) {
 		List<WardrobeItem> wardrobeItems = wardrobeItemService.getWardrobeItems(input.getCharacterName());
-		List<String> items = wardrobeItems.stream().map(item -> item.getName()).collect(Collectors.toList());
+		List<String> items = wardrobeItems.stream().map(WardrobeItem::getName).collect(Collectors.toList());
 		return JS.message(HttpStatus.OK, items);
 	}
 
 	@RequestMapping(path = "/add-wardrobe-item", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<?> addWardrobeItem(@Valid @RequestBody AddWardrobeItemParameter input) {
+	public ResponseEntity<JsonNode> addWardrobeItem(@Valid @RequestBody AddWardrobeItemParameter input) {
 		
 		//Duplicate protection
 		List<WardrobeItem> wardrobeItems = wardrobeItemService.getWardrobeItems(input.getCharacterName());
-		List<String> items = wardrobeItems.stream().map(item -> item.getName()).collect(Collectors.toList());
+		List<String> items = wardrobeItems.stream().map(WardrobeItem::getName).collect(Collectors.toList());
 		if(items.contains(input.getItemName())) {
 			return JS.message(HttpStatus.ALREADY_REPORTED, "Already in store");
 		}

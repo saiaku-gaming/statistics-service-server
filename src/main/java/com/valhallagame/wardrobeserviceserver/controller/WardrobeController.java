@@ -1,6 +1,8 @@
 package com.valhallagame.wardrobeserviceserver.controller;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -16,10 +18,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.valhallagame.characterserviceclient.CharacterServiceClient;
+import com.valhallagame.characterserviceclient.model.CharacterData;
 import com.valhallagame.common.JS;
+import com.valhallagame.common.RestResponse;
 import com.valhallagame.common.rabbitmq.NotificationMessage;
 import com.valhallagame.common.rabbitmq.RabbitMQRouting;
 import com.valhallagame.wardrobeserviceclient.message.AddWardrobeItemParameter;
+import com.valhallagame.wardrobeserviceclient.message.DebugAddWardrobeItemParameter;
 import com.valhallagame.wardrobeserviceclient.message.GetWardrobeItemsParameter;
 import com.valhallagame.wardrobeserviceserver.model.WardrobeItem;
 import com.valhallagame.wardrobeserviceserver.service.WardrobeItemService;
@@ -33,13 +39,28 @@ public class WardrobeController {
 
 	@Autowired
 	private WardrobeItemService wardrobeItemService;
-
+	
+	private static final CharacterServiceClient characterServiceClient = CharacterServiceClient.get();
+	
 	@RequestMapping(path = "/get-wardrobe-items", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<JsonNode> getWardrobeItems(@Valid @RequestBody GetWardrobeItemsParameter input) {
 		List<WardrobeItem> wardrobeItems = wardrobeItemService.getWardrobeItems(input.getCharacterName());
 		List<String> items = wardrobeItems.stream().map(WardrobeItem::getName).collect(Collectors.toList());
 		return JS.message(HttpStatus.OK, items);
+	}
+	
+	@RequestMapping(path = "/debug-add-wardrobe-item", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<JsonNode> addWardrobeItem(@Valid @RequestBody DebugAddWardrobeItemParameter input) throws IOException {
+		RestResponse<CharacterData> characterResp = characterServiceClient.getCharacterWithoutOwnerValidation(input.getUsername().toLowerCase());
+		Optional<CharacterData> characterOpt = characterResp.get();
+		if(characterOpt.isPresent()) {
+			AddWardrobeItemParameter newItemParam = new AddWardrobeItemParameter(characterOpt.get().getCharacterName(), input.getItemName());
+			return addWardrobeItem(newItemParam);
+		} else {
+			return JS.message(characterResp);
+		}
 	}
 
 	@RequestMapping(path = "/add-wardrobe-item", method = RequestMethod.POST)

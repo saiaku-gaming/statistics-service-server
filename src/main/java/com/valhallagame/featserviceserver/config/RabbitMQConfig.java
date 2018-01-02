@@ -1,4 +1,4 @@
-package com.valhallagame.wardrobeserviceserver.config;
+package com.valhallagame.featserviceserver.config;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -13,10 +13,10 @@ import com.valhallagame.common.rabbitmq.RabbitMQRouting;
 
 @Configuration
 public class RabbitMQConfig {
-	// Wardrobe configs
+	// Feat configs
 	@Bean
-	public DirectExchange wardrobeExchange() {
-		return new DirectExchange(RabbitMQRouting.Exchange.WARDROBE.name());
+	public DirectExchange featExchange() {
+		return new DirectExchange(RabbitMQRouting.Exchange.FEAT.name());
 	}
 
 	@Bean
@@ -32,13 +32,13 @@ public class RabbitMQConfig {
 	}
 	
 	@Bean
-	public Queue wardrobeCharacterDelete() {
-		return new Queue("wardrobeCharacterDeleteQueue");
+	public Queue featCharacterDelete() {
+		return new Queue("featCharacterDeleteQueue");
 	}
 	
 	@Bean
-	public Binding bindingCharacterDeleted(DirectExchange characterExchange, Queue wardrobeCharacterDeleteQueue) {
-		return BindingBuilder.bind(wardrobeCharacterDeleteQueue).to(characterExchange)
+	public Binding bindingCharacterDeleted(DirectExchange characterExchange, Queue featCharacterDeleteQueue) {
+		return BindingBuilder.bind(featCharacterDeleteQueue).to(characterExchange)
 				.with(RabbitMQRouting.Character.DELETE);
 	}
 

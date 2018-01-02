@@ -1,4 +1,4 @@
-package com.valhallagame.wardrobeserviceserver;
+package com.valhallagame.featserviceserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,7 +17,7 @@ public class App {
 	@Bean
 	public EmbeddedServletContainerCustomizer containerCustomizer() {
 		return (container -> {
-			container.setPort(DefaultServicePortMappings.WARDROBE_SERVICE_PORT);
+			container.setPort(DefaultServicePortMappings.FEAT_SERVICE_PORT);
 		});
 	}
 }

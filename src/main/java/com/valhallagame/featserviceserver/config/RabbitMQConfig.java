@@ -20,6 +20,17 @@ public class RabbitMQConfig {
 	}
 
 	@Bean
+	public Queue featCharacterDelete() {
+		return new Queue("featCharacterDeleteQueue");
+	}
+
+	@Bean
+	public Binding bindingCharacterDeleted(DirectExchange characterExchange, Queue featCharacterDeleteQueue) {
+		return BindingBuilder.bind(featCharacterDeleteQueue).to(characterExchange)
+				.with(RabbitMQRouting.Character.DELETE);
+	}
+
+	@Bean
 	public Jackson2JsonMessageConverter jacksonConverter() {
 		return new Jackson2JsonMessageConverter();
 	}
@@ -29,17 +40,6 @@ public class RabbitMQConfig {
 		SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
 		factory.setMessageConverter(jacksonConverter());
 		return factory;
-	}
-	
-	@Bean
-	public Queue featCharacterDelete() {
-		return new Queue("featCharacterDeleteQueue");
-	}
-	
-	@Bean
-	public Binding bindingCharacterDeleted(DirectExchange characterExchange, Queue featCharacterDeleteQueue) {
-		return BindingBuilder.bind(featCharacterDeleteQueue).to(characterExchange)
-				.with(RabbitMQRouting.Character.DELETE);
 	}
 
 }

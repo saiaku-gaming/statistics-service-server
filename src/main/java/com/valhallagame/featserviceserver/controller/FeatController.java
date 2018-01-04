@@ -30,7 +30,6 @@ import com.valhallagame.featserviceclient.message.GetFeatsParameter;
 import com.valhallagame.featserviceserver.model.Feat;
 import com.valhallagame.featserviceserver.service.FeatService;
 
-
 @Controller
 @RequestMapping(path = "/v1/feat")
 public class FeatController {
@@ -40,9 +39,10 @@ public class FeatController {
 
 	@Autowired
 	private FeatService featService;
-	
-	private static final CharacterServiceClient characterServiceClient = CharacterServiceClient.get();
-	
+
+	@Autowired
+	private CharacterServiceClient characterServiceClient;
+
 	@RequestMapping(path = "/get-feats", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<JsonNode> getFeats(@Valid @RequestBody GetFeatsParameter input) {
@@ -50,14 +50,16 @@ public class FeatController {
 		List<String> items = Feats.stream().map(Feat::getName).collect(Collectors.toList());
 		return JS.message(HttpStatus.OK, items);
 	}
-	
+
 	@RequestMapping(path = "/debug-add-feat", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<JsonNode> addFeat(@Valid @RequestBody DebugAddFeatParameter input) throws IOException {
-		RestResponse<CharacterData> characterResp = characterServiceClient.getCharacterWithoutOwnerValidation(input.getUsername().toLowerCase());
+		RestResponse<CharacterData> characterResp = characterServiceClient
+				.getCharacterWithoutOwnerValidation(input.getUsername().toLowerCase());
 		Optional<CharacterData> characterOpt = characterResp.get();
-		if(characterOpt.isPresent()) {
-			AddFeatParameter newItemParam = new AddFeatParameter(characterOpt.get().getCharacterName(), input.getItemName());
+		if (characterOpt.isPresent()) {
+			AddFeatParameter newItemParam = new AddFeatParameter(characterOpt.get().getCharacterName(),
+					input.getItemName());
 			return addFeat(newItemParam);
 		} else {
 			return JS.message(characterResp);
@@ -67,17 +69,16 @@ public class FeatController {
 	@RequestMapping(path = "/add-feat", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<JsonNode> addFeat(@Valid @RequestBody AddFeatParameter input) {
-		
-		//Duplicate protection
+
+		// Duplicate protection
 		List<Feat> Feats = featService.getFeats(input.getCharacterName());
 		List<String> items = Feats.stream().map(Feat::getName).collect(Collectors.toList());
-		if(items.contains(input.getFeatName())) {
+		if (items.contains(input.getFeatName())) {
 			return JS.message(HttpStatus.ALREADY_REPORTED, "Already in store");
 		}
-		
+
 		featService.saveFeat(new Feat(input.getFeatName(), input.getCharacterName()));
-		rabbitTemplate.convertAndSend(RabbitMQRouting.Exchange.FEAT.name(),
-				RabbitMQRouting.Feat.ADD_FEAT.name(),
+		rabbitTemplate.convertAndSend(RabbitMQRouting.Exchange.FEAT.name(), RabbitMQRouting.Feat.ADD_FEAT.name(),
 				new NotificationMessage(input.getCharacterName(), "feat item added"));
 
 		return JS.message(HttpStatus.OK, "Feat item added");

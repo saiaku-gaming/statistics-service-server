@@ -1,4 +1,4 @@
-package com.valhallagame.featserviceserver.model;
+package com.valhallagame.statisticsserviceserver.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,12 +16,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "feat")
-public class Feat {
+@Table(name = "statistics")
+public class Statistics {
 	@Id
-	@SequenceGenerator(name = "feat_feat_id_seq", sequenceName = "feat_feat_id_seq", allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "feat_feat_id_seq")
-	@Column(name = "feat_id", updatable = false)
+	@SequenceGenerator(name = "statistics_statistics_id_seq", sequenceName = "statistics_statistics_id_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "statistics_statistics_id_seq")
+	@Column(name = "statistics_id", updatable = false)
 	private Integer id;
 
 	@Column(name = "name")
@@ -30,7 +30,7 @@ public class Feat {
 	@Column(name = "character_owner")
 	private String characterOwner;
 
-	public Feat(String name, String characterOwner) {
+	public Statistics(String name, String characterOwner) {
 		this.name = name;
 		this.characterOwner = characterOwner;
 	}

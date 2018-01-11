@@ -1,4 +1,4 @@
-package com.valhallagame.featserviceserver;
+package com.valhallagame.statisticsserviceserver;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class App {
 	@Bean
 	public EmbeddedServletContainerCustomizer containerCustomizer() {
 		return (container -> {
-			container.setPort(DefaultServicePortMappings.FEAT_SERVICE_PORT);
+			container.setPort(DefaultServicePortMappings.STATISTICS_SERVICE_PORT);
 		});
 	}
 }

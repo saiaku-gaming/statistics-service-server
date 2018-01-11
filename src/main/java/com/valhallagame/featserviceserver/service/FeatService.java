@@ -1,28 +1,28 @@
-package com.valhallagame.featserviceserver.service;
+package com.valhallagame.statisticsserviceserver.service;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.valhallagame.featserviceserver.model.Feat;
-import com.valhallagame.featserviceserver.repository.FeatRepository;
+import com.valhallagame.statisticsserviceserver.model.Statistics;
+import com.valhallagame.statisticsserviceserver.repository.StatisticsRepository;
 
 @Service
-public class FeatService {
+public class StatisticsService {
 
 	@Autowired
-	private FeatRepository featItemRepository;
+	private StatisticsRepository statisticsItemRepository;
 
-	public Feat saveFeat(Feat feat) {
-		return featItemRepository.save(feat);
+	public Statistics saveStatistics(Statistics statistics) {
+		return statisticsItemRepository.save(statistics);
 	}
 
-	public void deleteFeat(Feat feat) {
-		featItemRepository.delete(feat);
+	public void deleteStatistics(Statistics statistics) {
+		statisticsItemRepository.delete(statistics);
 	}
 
-	public List<Feat> getFeats(String characterName) {
-		return featItemRepository.findByCharacterOwner(characterName);
+	public List<Statistics> getStatisticss(String characterName) {
+		return statisticsItemRepository.findByCharacterOwner(characterName);
 	}
 }

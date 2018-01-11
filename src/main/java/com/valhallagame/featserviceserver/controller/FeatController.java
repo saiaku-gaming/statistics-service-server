@@ -1,4 +1,4 @@
-package com.valhallagame.featserviceserver.controller;
+package com.valhallagame.statisticsserviceserver.controller;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,63 +24,63 @@ import com.valhallagame.common.JS;
 import com.valhallagame.common.RestResponse;
 import com.valhallagame.common.rabbitmq.NotificationMessage;
 import com.valhallagame.common.rabbitmq.RabbitMQRouting;
-import com.valhallagame.featserviceclient.message.AddFeatParameter;
-import com.valhallagame.featserviceclient.message.DebugAddFeatParameter;
-import com.valhallagame.featserviceclient.message.GetFeatsParameter;
-import com.valhallagame.featserviceserver.model.Feat;
-import com.valhallagame.featserviceserver.service.FeatService;
+import com.valhallagame.statisticsserviceclient.message.AddStatisticsParameter;
+import com.valhallagame.statisticsserviceclient.message.DebugAddStatisticsParameter;
+import com.valhallagame.statisticsserviceclient.message.GetStatisticssParameter;
+import com.valhallagame.statisticsserviceserver.model.Statistics;
+import com.valhallagame.statisticsserviceserver.service.StatisticsService;
 
 @Controller
-@RequestMapping(path = "/v1/feat")
-public class FeatController {
+@RequestMapping(path = "/v1/statistics")
+public class StatisticsController {
 
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
 
 	@Autowired
-	private FeatService featService;
+	private StatisticsService statisticsService;
 
 	@Autowired
 	private CharacterServiceClient characterServiceClient;
 
-	@RequestMapping(path = "/get-feats", method = RequestMethod.POST)
+	@RequestMapping(path = "/get-statisticss", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<JsonNode> getFeats(@Valid @RequestBody GetFeatsParameter input) {
-		List<Feat> Feats = featService.getFeats(input.getCharacterName());
-		List<String> items = Feats.stream().map(Feat::getName).collect(Collectors.toList());
+	public ResponseEntity<JsonNode> getStatisticss(@Valid @RequestBody GetStatisticssParameter input) {
+		List<Statistics> Statisticss = statisticsService.getStatisticss(input.getCharacterName());
+		List<String> items = Statisticss.stream().map(Statistics::getName).collect(Collectors.toList());
 		return JS.message(HttpStatus.OK, items);
 	}
 
-	@RequestMapping(path = "/debug-add-feat", method = RequestMethod.POST)
+	@RequestMapping(path = "/debug-add-statistics", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<JsonNode> addFeat(@Valid @RequestBody DebugAddFeatParameter input) throws IOException {
+	public ResponseEntity<JsonNode> addStatistics(@Valid @RequestBody DebugAddStatisticsParameter input) throws IOException {
 		RestResponse<CharacterData> characterResp = characterServiceClient
 				.getCharacterWithoutOwnerValidation(input.getUsername().toLowerCase());
 		Optional<CharacterData> characterOpt = characterResp.get();
 		if (characterOpt.isPresent()) {
-			AddFeatParameter newItemParam = new AddFeatParameter(characterOpt.get().getCharacterName(),
+			AddStatisticsParameter newItemParam = new AddStatisticsParameter(characterOpt.get().getCharacterName(),
 					input.getItemName());
-			return addFeat(newItemParam);
+			return addStatistics(newItemParam);
 		} else {
 			return JS.message(characterResp);
 		}
 	}
 
-	@RequestMapping(path = "/add-feat", method = RequestMethod.POST)
+	@RequestMapping(path = "/add-statistics", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<JsonNode> addFeat(@Valid @RequestBody AddFeatParameter input) {
+	public ResponseEntity<JsonNode> addStatistics(@Valid @RequestBody AddStatisticsParameter input) {
 
 		// Duplicate protection
-		List<Feat> Feats = featService.getFeats(input.getCharacterName());
-		List<String> items = Feats.stream().map(Feat::getName).collect(Collectors.toList());
-		if (items.contains(input.getFeatName())) {
+		List<Statistics> Statisticss = statisticsService.getStatisticss(input.getCharacterName());
+		List<String> items = Statisticss.stream().map(Statistics::getName).collect(Collectors.toList());
+		if (items.contains(input.getStatisticsName())) {
 			return JS.message(HttpStatus.ALREADY_REPORTED, "Already in store");
 		}
 
-		featService.saveFeat(new Feat(input.getFeatName(), input.getCharacterName()));
-		rabbitTemplate.convertAndSend(RabbitMQRouting.Exchange.FEAT.name(), RabbitMQRouting.Feat.ADD_FEAT.name(),
-				new NotificationMessage(input.getCharacterName(), "feat item added"));
+		statisticsService.saveStatistics(new Statistics(input.getStatisticsName(), input.getCharacterName()));
+		rabbitTemplate.convertAndSend(RabbitMQRouting.Exchange.STATISTICS.name(), RabbitMQRouting.Statistics.ADD_STATISTICS.name(),
+				new NotificationMessage(input.getCharacterName(), "statistics item added"));
 
-		return JS.message(HttpStatus.OK, "Feat item added");
+		return JS.message(HttpStatus.OK, "Statistics item added");
 	}
 }

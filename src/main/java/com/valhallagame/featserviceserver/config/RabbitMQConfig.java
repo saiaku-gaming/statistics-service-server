@@ -1,4 +1,4 @@
-package com.valhallagame.featserviceserver.config;
+package com.valhallagame.statisticsserviceserver.config;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -13,20 +13,20 @@ import com.valhallagame.common.rabbitmq.RabbitMQRouting;
 
 @Configuration
 public class RabbitMQConfig {
-	// Feat configs
+	// Statistics configs
 	@Bean
-	public DirectExchange featExchange() {
-		return new DirectExchange(RabbitMQRouting.Exchange.FEAT.name());
+	public DirectExchange statisticsExchange() {
+		return new DirectExchange(RabbitMQRouting.Exchange.STATISTICS.name());
 	}
 
 	@Bean
-	public Queue featCharacterDelete() {
-		return new Queue("featCharacterDeleteQueue");
+	public Queue statisticsCharacterDelete() {
+		return new Queue("statisticsCharacterDeleteQueue");
 	}
 
 	@Bean
-	public Binding bindingCharacterDeleted(DirectExchange characterExchange, Queue featCharacterDeleteQueue) {
-		return BindingBuilder.bind(featCharacterDeleteQueue).to(characterExchange)
+	public Binding bindingCharacterDeleted(DirectExchange characterExchange, Queue statisticsCharacterDeleteQueue) {
+		return BindingBuilder.bind(statisticsCharacterDeleteQueue).to(characterExchange)
 				.with(RabbitMQRouting.Character.DELETE);
 	}
 

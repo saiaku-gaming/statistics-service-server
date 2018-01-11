@@ -1,4 +1,4 @@
-package com.valhallagame.featserviceserver.config;
+package com.valhallagame.statisticsserviceserver.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

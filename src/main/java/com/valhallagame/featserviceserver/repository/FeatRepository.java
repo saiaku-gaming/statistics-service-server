@@ -1,11 +1,11 @@
-package com.valhallagame.featserviceserver.repository;
+wpackage com.valhallagame.statisticsserviceserver.repository;
 
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.valhallagame.featserviceserver.model.Feat;
+import com.valhallagame.statisticsserviceserver.model.Statistics;
 
-public interface FeatRepository extends JpaRepository<Feat, Integer> {
-	public List<Feat> findByCharacterOwner(String characterOwner);
+public interface StatisticsRepository extends JpaRepository<Statistics, Integer> {
+	public List<Statistics> findByCharacterOwner(String characterOwner);
 }

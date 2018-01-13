@@ -1,7 +1,5 @@
 package com.valhallagame.statisticsserviceserver.controller;
 
-import java.io.IOException;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +26,7 @@ public class StatisticsController {
 
 	@RequestMapping(path = "/increment", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<JsonNode> increment(@Valid @RequestBody IncrementParameter input) throws IOException {
+	public ResponseEntity<JsonNode> increment(@Valid @RequestBody IncrementParameter input) {
 		StatisticsCounter sc = statisticsService.increment(input.getCharacterName(), input.getKey(), input.getValue());
 		return JS.message(HttpStatus.OK, String.format("Updated char %s with key %s to count %s", sc.getCharacterName(), sc.getKey(), sc.getCount()));
 	}

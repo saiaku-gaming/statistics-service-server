@@ -1,7 +1,5 @@
 package com.valhallagame.statisticsserviceserver.controller;
 
-import java.io.IOException;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.valhallagame.common.JS;
-import com.valhallagame.statisticsserviceclient.message.IncrementParameter;
+import com.valhallagame.statisticsserviceclient.message.IncrementIntCounterParameter;
 import com.valhallagame.statisticsserviceserver.model.StatisticsCounter;
 import com.valhallagame.statisticsserviceserver.service.StatisticsCounterService;
 
@@ -26,10 +24,10 @@ public class StatisticsController {
 	@Autowired
 	private StatisticsCounterService statisticsService;
 
-	@RequestMapping(path = "/increment", method = RequestMethod.POST)
+	@RequestMapping(path = "/increment-int-counter", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<JsonNode> increment(@Valid @RequestBody IncrementParameter input) throws IOException {
-		StatisticsCounter sc = statisticsService.increment(input.getCharacterName(), input.getKey(), input.getValue());
+	public ResponseEntity<JsonNode> incrementIntCounter(@Valid @RequestBody IncrementIntCounterParameter input) {
+		StatisticsCounter sc = statisticsService.incrementIntCounter(input.getCharacterName(), input.getKey(), input.getValue());
 		return JS.message(HttpStatus.OK, String.format("Updated char %s with key %s to count %s", sc.getCharacterName(), sc.getKey(), sc.getCount()));
 	}
 }

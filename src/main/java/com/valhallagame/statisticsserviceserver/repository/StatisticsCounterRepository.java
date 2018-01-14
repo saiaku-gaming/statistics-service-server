@@ -18,7 +18,7 @@ public interface StatisticsCounterRepository extends JpaRepository<StatisticsCou
 			"        WHERE statistics_counter.key = EXCLUDED.key" + 
 			"        AND statistics_counter.character_name = EXCLUDED.character_name" + 
 			" RETURNING statistics_counter.*;", nativeQuery = true)
-	public StatisticsCounter increment(@Param("characterName") String characterName, @Param("key") String key, @Param("value") int value);
+	public StatisticsCounter incrementIntCounter(@Param("characterName") String characterName, @Param("key") String key, @Param("value") int value);
 	
 	@Transactional
 	public long deleteByCharacterName(String characterName); 

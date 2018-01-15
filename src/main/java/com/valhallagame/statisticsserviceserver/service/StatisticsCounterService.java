@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.valhallagame.common.rabbitmq.NotificationMessage;
 import com.valhallagame.common.rabbitmq.RabbitMQRouting;
+import com.valhallagame.statisticsserviceclient.message.StatisticsKey;
 import com.valhallagame.statisticsserviceserver.model.StatisticsCounter;
 import com.valhallagame.statisticsserviceserver.repository.StatisticsCounterRepository;
 
@@ -22,9 +23,9 @@ public class StatisticsCounterService {
 	@Autowired
 	private StatisticsCounterRepository statisticsCounterRepository;
 
-	public StatisticsCounter incrementIntCounter(String characterName, String key, int value) {
+	public StatisticsCounter incrementIntCounter(String characterName, StatisticsKey key, int value) {
 		
-		StatisticsCounter sc = statisticsCounterRepository.incrementIntCounter(characterName, key, value);
+		StatisticsCounter sc = statisticsCounterRepository.incrementIntCounter(characterName, key.name(), value);
 		
 		NotificationMessage notificationMessage = new NotificationMessage(characterName, "statistics item added");
 		notificationMessage.addData("characterName", characterName);

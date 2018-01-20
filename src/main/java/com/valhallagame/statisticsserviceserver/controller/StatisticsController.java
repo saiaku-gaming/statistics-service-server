@@ -27,7 +27,9 @@ public class StatisticsController {
 	@RequestMapping(path = "/increment-int-counter", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<JsonNode> incrementIntCounter(@Valid @RequestBody IncrementIntCounterParameter input) {
-		StatisticsCounter sc = statisticsService.incrementIntCounter(input.getCharacterName(), input.getKey(), input.getValue());
-		return JS.message(HttpStatus.OK, String.format("Updated char %s with key %s to count %s", sc.getCharacterName(), sc.getKey(), sc.getCount()));
+		StatisticsCounter sc = statisticsService.incrementIntCounter(input.getCharacterName().toLowerCase(),
+				input.getKey(), input.getValue());
+		return JS.message(HttpStatus.OK, String.format("Updated char %s with key %s to count %s", sc.getCharacterName(),
+				sc.getKey(), sc.getCount()));
 	}
 }

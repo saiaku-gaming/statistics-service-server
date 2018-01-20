@@ -16,21 +16,21 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "statistics_counter")
-public class StatisticsCounter {
-	
+@Table(name = "statistics_low_timer")
+public class StatisticsLowTimer {
+
 	@Id
-	@SequenceGenerator(name = "statistics_counter_statistics_counter_id_seq", sequenceName = "statistics_counter_statistics_counter_id_seq", allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "statistics_counter_statistics_counter_id_seq")
-	@Column(name = "statistics_counter_id", updatable = false)
+	@SequenceGenerator(name = "statistics_low_timer_statistics_low_timer_id_seq", sequenceName = "statistics_low_timer_statistics_low_timer_id_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "statistics_low_timer_statistics_low_timer_id_seq")
+	@Column(name = "statistics_low_timer_id", updatable = false)
 	private Integer id;
-	
-	@Column(name = "count")
-	int count;
-	
+
+	@Column(name = "timer")
+	private float timer;
+
 	@Column(name = "key")
-	String key;
-	
+	private String key;
+
 	@Column(name = "character_name")
-	String characterName;
+	private String characterName;
 }

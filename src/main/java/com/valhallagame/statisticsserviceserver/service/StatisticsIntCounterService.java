@@ -9,23 +9,23 @@ import org.springframework.stereotype.Service;
 import com.valhallagame.common.rabbitmq.NotificationMessage;
 import com.valhallagame.common.rabbitmq.RabbitMQRouting;
 import com.valhallagame.statisticsserviceclient.message.StatisticsKey;
-import com.valhallagame.statisticsserviceserver.model.StatisticsCounter;
-import com.valhallagame.statisticsserviceserver.repository.StatisticsCounterRepository;
+import com.valhallagame.statisticsserviceserver.model.StatisticsIntCounter;
+import com.valhallagame.statisticsserviceserver.repository.StatisticsIntCounterRepository;
 
 @Service
-public class StatisticsCounterService {
+public class StatisticsIntCounterService {
 
-	private final Logger logger = LoggerFactory.getLogger(StatisticsCounterService.class);
+	private final Logger logger = LoggerFactory.getLogger(StatisticsIntCounterService.class);
 	
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
 	
 	@Autowired
-	private StatisticsCounterRepository statisticsCounterRepository;
+	private StatisticsIntCounterRepository statisticsCounterRepository;
 
-	public StatisticsCounter incrementIntCounter(String characterName, StatisticsKey key, int value) {
+	public StatisticsIntCounter incrementIntCounter(String characterName, StatisticsKey key, int value) {
 		
-		StatisticsCounter sc = statisticsCounterRepository.incrementIntCounter(characterName, key.name(), value);
+		StatisticsIntCounter sc = statisticsCounterRepository.incrementIntCounter(characterName, key.name(), value);
 		
 		NotificationMessage notificationMessage = new NotificationMessage(characterName, "statistics item added");
 		notificationMessage.addData("characterName", characterName);

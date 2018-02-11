@@ -1,5 +1,8 @@
 package com.valhallagame.statisticsserviceserver.controller;
 
+import java.io.IOException;
+import java.util.Optional;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,10 @@ import com.valhallagame.statisticsserviceserver.service.StatisticsLowTimerServic
 @RequestMapping(path = "/v1/statistics")
 public class StatisticsController {
 
+	private static final String UPDATED_CHAR_S_WITH_KEY_S_TO_COUNT_S = "Updated char %s with key %s to count %s";
+
+	private static final String CHARACTER_COULD_NOT_BE_FOUND = "Character %s could not be found.";
+
 	@Autowired
 	private StatisticsIntCounterService statisticsIntService;
 
@@ -38,30 +45,48 @@ public class StatisticsController {
 
 	@RequestMapping(path = "/increment-int-counter", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<JsonNode> incrementIntCounter(@Valid @RequestBody IncrementIntCounterParameter input) {
-		StatisticsIntCounter sc = statisticsIntService.incrementIntCounter(input.getCharacterName().toLowerCase(),
-				input.getKey(), input.getValue());
-		return JS.message(HttpStatus.OK, String.format("Updated char %s with key %s to count %s", sc.getCharacterName(),
-				sc.getKey(), sc.getCount()));
+	public ResponseEntity<JsonNode> incrementIntCounter(@Valid @RequestBody IncrementIntCounterParameter input)
+			throws IOException {
+		Optional<StatisticsIntCounter> scOpt = statisticsIntService
+				.incrementIntCounter(input.getCharacterName().toLowerCase(), input.getKey(), input.getValue());
+		if (scOpt.isPresent()) {
+			StatisticsIntCounter sc = scOpt.get();
+			return JS.message(HttpStatus.OK, String.format(UPDATED_CHAR_S_WITH_KEY_S_TO_COUNT_S,
+					sc.getCharacterName(), sc.getKey(), sc.getCount()));
+		} else {
+			return JS.message(HttpStatus.BAD_REQUEST,
+					String.format(CHARACTER_COULD_NOT_BE_FOUND, input.getCharacterName()));
+		}
 	}
 
 	@RequestMapping(path = "/update-low-timer", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<JsonNode> updateLowTimer(@Valid @RequestBody UpdateLowTimerParameter input) {
-		StatisticsLowTimer slt = lowTimerService.upsertLowTimer(input.getCharacterName().toLowerCase(),
+	public ResponseEntity<JsonNode> updateLowTimer(@Valid @RequestBody UpdateLowTimerParameter input) throws IOException {
+		Optional<StatisticsLowTimer> sltOpt = lowTimerService.upsertLowTimer(input.getCharacterName().toLowerCase(),
 				input.getKey(), input.getTimer());
-		return JS.message(HttpStatus.OK,
-				String.format("Updated char %s with key %s to count %s", slt.getCharacterName(),
-						slt.getKey(), slt.getTimer()));
+		if (sltOpt.isPresent()) {
+			StatisticsLowTimer slt = sltOpt.get();
+			return JS.message(HttpStatus.OK, String.format(UPDATED_CHAR_S_WITH_KEY_S_TO_COUNT_S,
+					slt.getCharacterName(), slt.getKey(), slt.getTimer()));
+		} else {
+			return JS.message(HttpStatus.BAD_REQUEST,
+					String.format(CHARACTER_COULD_NOT_BE_FOUND, input.getCharacterName()));
+		}
 	}
 
 	@RequestMapping(path = "/update-high-timer", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<JsonNode> updateHighTimer(@Valid @RequestBody UpdateHighTimerParameter input) {
-		StatisticsHighTimer sht = highTimerService.upsertLowTimer(input.getCharacterName().toLowerCase(),
+	public ResponseEntity<JsonNode> updateHighTimer(@Valid @RequestBody UpdateHighTimerParameter input)
+			throws IOException {
+		Optional<StatisticsHighTimer> shtOpt = highTimerService.upsertLowTimer(input.getCharacterName().toLowerCase(),
 				input.getKey(), input.getTimer());
-		return JS.message(HttpStatus.OK,
-				String.format("Updated char %s with key %s to count %s", sht.getCharacterName(),
-						sht.getKey(), sht.getTimer()));
+		if (shtOpt.isPresent()) {
+			StatisticsHighTimer sht = shtOpt.get();
+			return JS.message(HttpStatus.OK, String.format(UPDATED_CHAR_S_WITH_KEY_S_TO_COUNT_S,
+					sht.getCharacterName(), sht.getKey(), sht.getTimer()));
+		} else {
+			return JS.message(HttpStatus.BAD_REQUEST,
+					String.format(CHARACTER_COULD_NOT_BE_FOUND, input.getCharacterName()));
+		}
 	}
 }

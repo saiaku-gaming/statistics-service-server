@@ -1,14 +1,5 @@
 package com.valhallagame.statisticsserviceserver.service;
 
-import java.io.IOException;
-import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.valhallagame.characterserviceclient.CharacterServiceClient;
 import com.valhallagame.characterserviceclient.model.CharacterData;
 import com.valhallagame.common.RestResponse;
@@ -17,6 +8,14 @@ import com.valhallagame.common.rabbitmq.RabbitMQRouting;
 import com.valhallagame.statisticsserviceclient.message.StatisticsKey;
 import com.valhallagame.statisticsserviceserver.model.StatisticsIntCounter;
 import com.valhallagame.statisticsserviceserver.repository.StatisticsIntCounterRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.Optional;
 
 @Service
 public class StatisticsIntCounterService {
@@ -33,7 +32,7 @@ public class StatisticsIntCounterService {
 	private StatisticsIntCounterRepository statisticsCounterRepository;
 
 	public Optional<StatisticsIntCounter> incrementIntCounter(String characterName, StatisticsKey key, int value) throws IOException {
-		
+		logger.info("Incrementing int counter key {} value {} character {}", key, value, characterName);
 		StatisticsIntCounter sc = statisticsCounterRepository.incrementIntCounter(characterName, key.name(), value);
 		
 		RestResponse<CharacterData> characterResp = characterServiceClient.getCharacter(characterName);
@@ -57,6 +56,7 @@ public class StatisticsIntCounterService {
 	}
 
 	public void deleteStatistics(String characterName) {
+		logger.info("Deleting statistics for {}", characterName);
 		statisticsCounterRepository.deleteByCharacterName(characterName);
 	}
 }

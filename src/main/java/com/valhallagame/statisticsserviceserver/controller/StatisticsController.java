@@ -1,19 +1,5 @@
 package com.valhallagame.statisticsserviceserver.controller;
 
-import java.io.IOException;
-import java.util.Optional;
-
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.valhallagame.common.JS;
 import com.valhallagame.statisticsserviceclient.message.IncrementIntCounterParameter;
@@ -25,14 +11,28 @@ import com.valhallagame.statisticsserviceserver.model.StatisticsLowTimer;
 import com.valhallagame.statisticsserviceserver.service.StatisticsHighTimerService;
 import com.valhallagame.statisticsserviceserver.service.StatisticsIntCounterService;
 import com.valhallagame.statisticsserviceserver.service.StatisticsLowTimerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.Optional;
 
 @Controller
 @RequestMapping(path = "/v1/statistics")
 public class StatisticsController {
 
 	private static final String UPDATED_CHAR_S_WITH_KEY_S_TO_COUNT_S = "Updated char %s with key %s to count %s";
-
 	private static final String CHARACTER_COULD_NOT_BE_FOUND = "Character %s could not be found.";
+	private static final Logger logger = LoggerFactory.getLogger(StatisticsController.class);
 
 	@Autowired
 	private StatisticsIntCounterService statisticsIntService;
@@ -47,6 +47,7 @@ public class StatisticsController {
 	@ResponseBody
 	public ResponseEntity<JsonNode> incrementIntCounter(@Valid @RequestBody IncrementIntCounterParameter input)
 			throws IOException {
+		logger.info("Increment Int Counter called with {}", input);
 		Optional<StatisticsIntCounter> scOpt = statisticsIntService
 				.incrementIntCounter(input.getCharacterName().toLowerCase(), input.getKey(), input.getValue());
 		if (scOpt.isPresent()) {
@@ -62,6 +63,7 @@ public class StatisticsController {
 	@RequestMapping(path = "/update-low-timer", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<JsonNode> updateLowTimer(@Valid @RequestBody UpdateLowTimerParameter input) throws IOException {
+		logger.info("Update Low Timer called with {}", input);
 		Optional<StatisticsLowTimer> sltOpt = lowTimerService.upsertLowTimer(input.getCharacterName().toLowerCase(),
 				input.getKey(), input.getTimer());
 		if (sltOpt.isPresent()) {
@@ -78,6 +80,7 @@ public class StatisticsController {
 	@ResponseBody
 	public ResponseEntity<JsonNode> updateHighTimer(@Valid @RequestBody UpdateHighTimerParameter input)
 			throws IOException {
+		logger.info("Update High Timer called with {}", input);
 		Optional<StatisticsHighTimer> shtOpt = highTimerService.upsertLowTimer(input.getCharacterName().toLowerCase(),
 				input.getKey(), input.getTimer());
 		if (shtOpt.isPresent()) {

@@ -1,14 +1,5 @@
 package com.valhallagame.statisticsserviceserver.service;
 
-import java.io.IOException;
-import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.valhallagame.characterserviceclient.CharacterServiceClient;
 import com.valhallagame.characterserviceclient.model.CharacterData;
 import com.valhallagame.common.RestResponse;
@@ -17,6 +8,14 @@ import com.valhallagame.common.rabbitmq.RabbitMQRouting;
 import com.valhallagame.statisticsserviceclient.message.StatisticsKey;
 import com.valhallagame.statisticsserviceserver.model.StatisticsLowTimer;
 import com.valhallagame.statisticsserviceserver.repository.StatisticsLowTimerRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.Optional;
 
 @Service
 public class StatisticsLowTimerService {
@@ -33,7 +32,7 @@ public class StatisticsLowTimerService {
 	private CharacterServiceClient characterServiceClient;
 
 	public Optional<StatisticsLowTimer> upsertLowTimer(String characterName, StatisticsKey key, float timer) throws IOException {
-
+		logger.info("Upserting low timer key {} timer {} character {}", key, timer, characterName);
 		StatisticsLowTimer slt = lowTimerRepository.upsertLowTimer(characterName, key.name(), timer);
 
 		RestResponse<CharacterData> characterResp = characterServiceClient.getCharacter(characterName);
@@ -59,6 +58,7 @@ public class StatisticsLowTimerService {
 	}
 
 	public void deleteStatistics(String characterName) {
+		logger.info("Deleting statistics for {}", characterName);
 		lowTimerRepository.deleteByCharacterName(characterName);
 	}
 

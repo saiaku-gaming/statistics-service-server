@@ -1,18 +1,24 @@
 package com.valhallagame.statisticsserviceserver.config;
 
+import com.valhallagame.common.rabbitmq.RabbitMQRouting;
+import com.valhallagame.common.rabbitmq.RabbitSender;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.valhallagame.common.rabbitmq.RabbitMQRouting;
-
 @Configuration
 public class RabbitMQConfig {
+
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
+
 	// Statistics configs
 	@Bean
 	public DirectExchange statisticsExchange() {
@@ -42,4 +48,8 @@ public class RabbitMQConfig {
 		return factory;
 	}
 
+	@Bean
+	public RabbitSender rabbitSender() {
+		return new RabbitSender(rabbitTemplate);
+	}
 }

@@ -5,12 +5,12 @@ import com.valhallagame.characterserviceclient.model.CharacterData;
 import com.valhallagame.common.RestResponse;
 import com.valhallagame.common.rabbitmq.NotificationMessage;
 import com.valhallagame.common.rabbitmq.RabbitMQRouting;
+import com.valhallagame.common.rabbitmq.RabbitSender;
 import com.valhallagame.statisticsserviceclient.message.StatisticsKey;
 import com.valhallagame.statisticsserviceserver.model.StatisticsHighTimer;
 import com.valhallagame.statisticsserviceserver.repository.StatisticsHighTimerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +29,7 @@ public class StatisticsHighTimerService {
 	private CharacterServiceClient characterServiceClient;
 
 	@Autowired
-	private RabbitTemplate rabbitTemplate;
+	private RabbitSender rabbitSender;
 
 	public Optional<StatisticsHighTimer> upsertLowTimer(String characterName, StatisticsKey key, float timer) throws IOException {
 		logger.info("Upserting low timer with key {} timer {} character {}", key, timer, characterName);
@@ -48,7 +48,7 @@ public class StatisticsHighTimerService {
 
 		logger.info("incremented and now sending");
 
-		rabbitTemplate.convertAndSend(RabbitMQRouting.Exchange.STATISTICS.name(),
+		rabbitSender.sendMessage(RabbitMQRouting.Exchange.STATISTICS,
 				RabbitMQRouting.Statistics.HIGH_TIMER.name(),
 				notificationMessage);
 

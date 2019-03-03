@@ -5,12 +5,12 @@ import com.valhallagame.characterserviceclient.model.CharacterData;
 import com.valhallagame.common.RestResponse;
 import com.valhallagame.common.rabbitmq.NotificationMessage;
 import com.valhallagame.common.rabbitmq.RabbitMQRouting;
+import com.valhallagame.common.rabbitmq.RabbitSender;
 import com.valhallagame.statisticsserviceclient.message.StatisticsKey;
 import com.valhallagame.statisticsserviceserver.model.StatisticsIntCounter;
 import com.valhallagame.statisticsserviceserver.repository.StatisticsIntCounterRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +23,7 @@ public class StatisticsIntCounterService {
 	private final Logger logger = LoggerFactory.getLogger(StatisticsIntCounterService.class);
 	
 	@Autowired
-	private RabbitTemplate rabbitTemplate;
+	private RabbitSender rabbitSender;
 	
 	@Autowired
 	private CharacterServiceClient characterServiceClient;
@@ -48,8 +48,8 @@ public class StatisticsIntCounterService {
 		notificationMessage.addData("count", sc.getCount());
 		
 		logger.info("incremented and now sending");
-		
-		rabbitTemplate.convertAndSend(RabbitMQRouting.Exchange.STATISTICS.name(), RabbitMQRouting.Statistics.INT_COUNTER.name(),
+
+		rabbitSender.sendMessage(RabbitMQRouting.Exchange.STATISTICS, RabbitMQRouting.Statistics.INT_COUNTER.name(),
 				notificationMessage);
 		
 		return Optional.of(sc);

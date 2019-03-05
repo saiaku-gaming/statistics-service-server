@@ -30,6 +30,8 @@ public class NotificationConsumer {
 		try {
 			String characterName = (String) message.getData().get("characterName");
 			statisticsService.deleteStatistics(characterName);
+		} catch (Exception e) {
+			logger.error("Error while processing Character Delete notification", e);
 		} finally {
 			MDC.clear();
 		}
